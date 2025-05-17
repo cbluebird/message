@@ -8,5 +8,10 @@ import (
 func autoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&model.User{},
+		&model.Message{},
+		&model.Group{},
+		&model.GroupUser{},
+		&model.InitReq{},
+		&model.Friend{},
 	)
 }

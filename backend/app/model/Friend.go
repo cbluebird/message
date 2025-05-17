@@ -2,9 +2,12 @@ package model
 
 import "time"
 
-type InitReq struct {
+type Friend struct {
 	Id            int       `json:"id" gorm:"primaryKey;autoIncrement"`
-	UserId        int       `json:"user_id"`
+	FromId        string    `json:"user1" `
+	ToId          string    `json:"user2" `
 	LastMessageId int       `json:"last_message_id"`
 	Ctime         time.Time `json:"ctime" gorm:"autoCreateTime"`
+	// 备注
+	Content string `json:"content"`
 }
