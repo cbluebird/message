@@ -1,0 +1,13 @@
+dev: true
+
+db:
+  user: "root"
+  password: "123456"
+  address: "localhost:3306"
+  name: "user_center"
+
+redis:
+  host: "127.0.0.1"
+  port: "6379"
+  db: 0
+  password:
