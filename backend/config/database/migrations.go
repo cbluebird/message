@@ -11,7 +11,9 @@ func autoMigrate(db *gorm.DB) error {
 		&model.Message{},
 		&model.Group{},
 		&model.GroupUser{},
-		&model.InitReq{},
+		&model.FriendApply{},
 		&model.Friend{},
+		&model.Puq{},
+		&model.PuqContent{},
 	)
 }

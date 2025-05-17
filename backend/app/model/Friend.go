@@ -4,8 +4,8 @@ import "time"
 
 type Friend struct {
 	Id            int       `json:"id" gorm:"primaryKey;autoIncrement"`
-	FromId        string    `json:"user1" `
-	ToId          string    `json:"user2" `
+	FromId        int       `json:"user1" `
+	ToId          int       `json:"user2" `
 	LastMessageId int       `json:"last_message_id"`
 	Ctime         time.Time `json:"ctime" gorm:"autoCreateTime"`
 	// 备注
