@@ -9,11 +9,13 @@ import (
 	"message/config/database"
 	"message/config/redis"
 	"message/config/router"
+	"message/config/ws"
 )
 
 func main() {
 	database.NewRunOptions().Init()
 	redis.NewRunOptions().Init()
+	ws.InitClientHub()
 	r := gin.Default()
 	r.Use(cors.Default())
 	r.NoMethod(midwares.HandleNotFound)

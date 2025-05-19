@@ -6,6 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"message/app/model"
 	"message/config/database"
+	"time"
 )
 
 func CreateMessage(message *model.Message) error {
@@ -19,6 +20,12 @@ func ListMessage(userId, fromId, num, MessageType int) ([]*model.Message, error)
 		SendTo:   userId,
 		From:     fromId,
 	}).Order("ctime DESC").Limit(num).Find(&ansList)
+	return ansList, nil
+}
+
+func GetMessageList(userId int, out time.Time) ([]*model.Message, error) {
+	ansList := make([]*model.Message, 0)
+	database.DB.Model(&model.Message{}).Where("send_to = ? AND ctime > ?", userId, out).Order("ctime DESC").Find(&ansList)
 	return ansList, nil
 }
 

@@ -26,9 +26,7 @@ func Init(r *gin.Engine) {
 	}
 	message := api.Group("/message", middleware.TokenAuth)
 	{
-		message.POST("/send", messageController.SendMessage)
-		message.GET("/new", messageController.GetAllNewMessage)
-		message.GET("/get", messageController.ListMessage)
+		message.POST("/ws", messageController.WsServer)
 		message.POST("/translate", messageController.Translate) // 查看某个用户的消息
 	}
 	group := api.Group("/group", middleware.TokenAuth)
