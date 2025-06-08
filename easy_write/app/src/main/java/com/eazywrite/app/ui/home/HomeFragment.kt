@@ -60,7 +60,6 @@ import com.eazywrite.app.common.toast
 import com.eazywrite.app.data.model.Bill
 import com.eazywrite.app.data.model.Categories
 import com.eazywrite.app.data.repository.NotLoggedInException
-import com.eazywrite.app.ui.audiorecord.AudioRecordActivity
 import com.eazywrite.app.ui.bill.AddBillContentActivity
 import com.eazywrite.app.ui.bill.BillEditAction
 import com.eazywrite.app.ui.bill.BillEditDialog
@@ -555,23 +554,7 @@ private fun Fab(
                 Icon(Icons.Outlined.PhotoCamera, null)
             }
         }
-        item {
-            FabWithLabel(
-                onClick = {
-                    scope.launch {
-                        checkIsLoggedIn(vm)
-                        context.startActivity<AudioRecordActivity>()
-                    }
-                },
-                labelContent = { Text(text = "智能添加") },
-                labelBorder = AssistChipDefaults.assistChipBorder(
-                    borderWidth = 0.dp,
-                    borderColor = Color.Transparent
-                )
-            ) {
-                Icon(painterResource(id = R.drawable.ai), null)
-            }
-        }
+
     }
 }
 

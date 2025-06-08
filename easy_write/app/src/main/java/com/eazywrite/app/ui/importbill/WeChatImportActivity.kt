@@ -42,18 +42,18 @@ import kotlinx.coroutines.launch
 class WeChatImportActivity : ComponentActivity() {
 
     companion object {
-        private const val TAG = "WeChatImportActivity"
+        private const val TAG = "WeChatImportActivity" // 定义日志标签
     }
 
+    // 使用 viewModels() 委托获取 WechatImportViewModel 实例
     private val viewModel: WechatImportViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindow(isDarkStatusBarIcon = true)
-        setData(intent)
+        setWindow(isDarkStatusBarIcon = true) // 设置状态栏图标为深色
+        setData(intent) // 处理传入的 Intent 数据
         setContent {
             EazyWriteTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -62,12 +62,12 @@ class WeChatImportActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 
-    private val autoService: AutoAccessibilityService?
-        get() = AutoAccessibilityService.instance
+    // 获取 AutoAccessibilityService 实例
+    private val autoService: AutoAccessibilityService? get() = AutoAccessibilityService.instance
 
+    // 创建一个主线程的 CoroutineScope 实例
     private val autoJob: CoroutineScope = MainScope()
 
     @Composable
@@ -83,7 +83,7 @@ class WeChatImportActivity : ComponentActivity() {
                     .verticalScroll(rememberScrollState())
             ) {
                 FileInput(onFileInput = {
-                    viewModel.uri = it
+                    viewModel.uri = it // 设置选择的文件 URI
                 })
                 val context = LocalContext.current
                 ElevatedButton(
@@ -130,7 +130,6 @@ class WeChatImportActivity : ComponentActivity() {
                     Text("使用QQ里面的QQ邮箱功能无法下载文件，所以需要使用QQ邮箱客户端, 账单文件只能下载一次，请勿多次点击")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("微信导入教程：", style = MaterialTheme.typography.titleLarge)
-
                 }
                 Image(
                     painter = painterResource(id = R.drawable.wechat_import),
@@ -154,6 +153,7 @@ class WeChatImportActivity : ComponentActivity() {
         }
     }
 
+    // 自动跳转到微信并执行操作
     private fun autoJump(context: Context) {
         if (autoService == null || !AccessibilityxService.isAccessibilityServiceEnabled(
                 context,
@@ -192,7 +192,6 @@ class WeChatImportActivity : ComponentActivity() {
                         autoService?.untilFindOne { it.text1 == text }
                             ?.ensureClick()
                     }
-
                 }
                 val successFlag =
                     autoService?.untilFindOne { it.text1 == "申请已提交" }
@@ -209,10 +208,6 @@ class WeChatImportActivity : ComponentActivity() {
                         autoService?.untilFindOne { it.text1 == text }
                             ?.ensureClick()
                     }
-//                    autoService?.untilFindOne { it.text1 == "账单文件发送成功通知" }
-//                        ?.let { node ->
-//                            autoService?.click(node.bounds)
-//                        }
                 }
             }
         } else {
@@ -228,6 +223,7 @@ class WeChatImportActivity : ComponentActivity() {
         }
     }
 
+    // 处理传入的 Intent 数据
     private fun setData(intent: Intent) {
         Log.d(TAG, "setData:action: ${intent.action}")
         Log.d(TAG, "setData:data: ${intent.data}")
@@ -245,11 +241,4 @@ class WeChatImportActivity : ComponentActivity() {
             }
         }
     }
-
-
 }
-
-
-
-
-

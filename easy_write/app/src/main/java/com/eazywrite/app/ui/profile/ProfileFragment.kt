@@ -243,8 +243,7 @@ fun Card1() {
                 .wrapContentSize()
                 .padding(16.dp)
         ) {
-            CustomerServiceNumber()
-            Feedback()
+
             AppDetailsSettings()
             NotificationPermissions()
         }
@@ -259,8 +258,7 @@ fun Card2() {
                 .wrapContentSize()
                 .padding(16.dp)
         ) {
-            Author()
-            FrequentlyAskedQuestions()
+
             DownloadAddress()
             ExitApp()
             CheckForUpdates()
@@ -268,92 +266,9 @@ fun Card2() {
     }
 }
 
-@Composable
-private fun CustomerServiceNumber() {
-    val context = LocalContext.current
-    Item(
-        onClick = {
-            if (context is AppCompatActivity) {
-                val modalBottomSheet = MyBottomSheet()
-                modalBottomSheet
-                    .show(
-                        context.supportFragmentManager,
-                        "HelloWorld"
-                    )
-            }
-        },
-        icon = {
-            Icon(
-                Icons.Outlined.Call,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
-        text = {
-            Text(text = "客服电话")
-        }
-    )
-}
 
-@Composable
-private fun Author() {
-    val context = LocalContext.current
-    Item(
-        onClick = {
-            context.startActivity<SettingsActivity>()
-        },
-        icon = {
-            Icon(
-                Icons.Outlined.Person,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
-        text = {
-            Text(text = "作者相关")
-        }
-    )
-}
 
-@Composable
-private fun FrequentlyAskedQuestions() {
-    val context = LocalContext.current
-    Item(
-        onClick = {
-            context.startActivity<FrequentlyAskedQuestionsActivity>()
-        },
-        icon = {
-            Icon(
-                Icons.Outlined.Feedback,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
-        text = {
-            Text(text = "常见问题")
-        }
-    )
-}
 
-@Composable
-private fun Feedback() {
-    val context = LocalContext.current
-    Item(
-        onClick = {
-            context.startActivity<FeedbackActivity>()
-        },
-        icon = {
-            Icon(
-                Icons.Outlined.Feedback,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
-        text = {
-            Text(text = "问题反馈")
-        }
-    )
-}
 
 var isFirstTimeOpenAppDetailsSettings: Boolean = true
 
