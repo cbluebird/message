@@ -119,15 +119,11 @@
             android:name=".ui.profile.feedback.FeedbackActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".ui.audiorecord.AudioRecordActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.bill.ArticleActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.author.SettingsActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.gpt.ChatActivity"
             android:exported="false"

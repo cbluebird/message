@@ -18,10 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
-/**
- * @author wilinz
- * @date 2023/3/20 20:09
- */
+
 @Composable
 fun OutlinedFormField(
     state: FormFieldState,

@@ -25,22 +25,29 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/**
- * @author wilinz
- * @date 2023/4/3 16:57
- */
+
 class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
+    // 折线图数据状态
     var lineChartData by mutableStateOf<List<AASeriesElement>>(listOf())
 
+    // 折线图X轴数据状态
     var lineChartXData: SnapshotStateList<String> = mutableStateListOf()
 
+    // 饼图数据状态（支出）
     var pieChartOutData by mutableStateOf<AASeriesElement?>(null)
 
+    // 饼图数据状态（收入）
     var pieChartInData by mutableStateOf<AASeriesElement?>(null)
 
+    // 标签页状态
     var tab by mutableStateOf(false)
 
+    /**
+     * 刷新指定年份和可选月份的图表数据。
+     * @param year 要刷新数据的年份。
+     * @param month 要刷新数据的月份，如果为null则刷新整年数据。
+     */
     fun refresh(year: Int, month: Int? = null) {
         viewModelScope.launch {
             launch { getLineChartData(year, month) }
@@ -48,6 +55,11 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * 获取指定年份和可选月份的折线图数据。
+     * @param year 要获取数据的年份。
+     * @param month 要获取数据的月份，如果为null则获取整年数据。
+     */
     private suspend fun getLineChartData(year: Int, month: Int? = null) {
         val labelList =
             if (month == null) getMonthListByYear(year) else getDayListByMonth(year, month)
@@ -86,6 +98,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    // 根据年份获取月份范围列表
     private fun getMonthListByYear(year: Int): List<Pair<LocalDate, LocalDate>> {
         val list = mutableListOf<Pair<LocalDate, LocalDate>>()
         val date = LocalDate.of(year, 1, 1).atStartOfDay()
@@ -97,6 +110,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         return list
     }
 
+    // 根据年月获取天范围列表
     private fun getDayListByMonth(year: Int, month: Int): List<Pair<LocalDate, LocalDate>> {
         val list = mutableListOf<Pair<LocalDate, LocalDate>>()
 
@@ -109,24 +123,37 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         return list
     }
 
+    // 获取年份范围
     private fun getYearRange(year: Int): Pair<LocalDate, LocalDate> {
         val start = LocalDate.of(year, 1, 1).atStartOfDay()
         return Pair(start.toLocalDate(), start.plusYears(1).toLocalDate())
     }
 
+    // 获取月份范围
     private fun getMonthRange(year: Int, month: Int): Pair<LocalDate, LocalDate> {
         val start = LocalDate.of(year, month, 1).atStartOfDay()
         return Pair(start.toLocalDate(), start.plusMonths(1).toLocalDate())
     }
 
+    // 获取所有类别
     private suspend fun getAllCategory(
         startDate: LocalDate? = null,
         endDate: LocalDate? = null,
         type: String,
     ): List<String> = BillRepository.getAllCategory(startDate, endDate, type)
 
+    // 报告数据状态
     var report: String? by mutableStateOf(null)
 
+    /**
+     * 生成指定年份和可选月份的报告。
+     * @param year 要生成报告的年份。
+     * @param month 要生成报告的月份，如果为null则生成整年报告。
+     * @param onSuccess 成功时的回调函数。
+     * @param onFailure 失败时的回调函数。
+     * @param onComplete 完成时的回调函数。
+     * @return 表示报告生成任务的Job。
+     */
     fun generateReports1(
         year: Int,
         month: Int? = null,
@@ -147,6 +174,12 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * 生成指定年份和可选月份的报告。
+     * @param year 要生成报告的年份。
+     * @param month 要生成报告的月份，如果为null则生成整年报告。
+     * @return 生成的报告字符串。
+     */
     suspend fun generateReports(year: Int, month: Int? = null): String = withContext(Dispatchers.Default) {
         val desc = if (month != null) "这是我${year}年${month}月的一份账单数据" else "这是我${year}年的一份账单数据"
         val data = BillingAnalyticsData(
@@ -168,10 +201,17 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         return@withContext chatResult.choices.first().message.content
     }
 
+    // 获取所有ID
     fun getAllId(): Flow<List<Int>> {
         return BillRepository.getAllId()
     }
 
+    /**
+     * 获取指定年份和可选月份的趋势数据。
+     * @param year 要获取数据的年份。
+     * @param month 要获取数据的月份，如果为null则获取整年数据。
+     * @return 财务分析数据。
+     */
     suspend fun getTrendData(year: Int, month: Int? = null): FinancialAnalysisData {
         val labelList =
             if (month == null) getMonthListByYear(year) else getDayListByMonth(year, month)
@@ -207,6 +247,12 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    /**
+     * 获取指定年份和可选月份的百分比数据。
+     * @param year 要获取数据的年份。
+     * @param month 要获取数据的月份，如果为null则获取整年数据。
+     * @return 百分比数据。
+     */
     suspend fun getPercentageData(year: Int, month: Int? = null): PercentageData {
         val dateRange = if (month == null) getYearRange(year) else getMonthRange(year, month)
         val outCategories = getAllCategory(dateRange.first, dateRange.second, Bill.TYPE_OUT)
@@ -275,6 +321,7 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // 获取指定年份和可选月份的饼图数据
     private suspend fun getPieDate(year: Int, month: Int? = null) {
         val dateRange = if (month == null) getYearRange(year) else getMonthRange(year, month)
         val outCategories = getAllCategory(dateRange.first, dateRange.second, Bill.TYPE_OUT)

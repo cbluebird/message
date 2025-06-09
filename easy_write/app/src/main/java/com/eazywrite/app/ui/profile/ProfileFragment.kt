@@ -53,7 +53,6 @@ import com.eazywrite.app.data.setHideUpdateVersionCode
 import com.eazywrite.app.data.setNotificationPermission
 import com.eazywrite.app.databinding.KefuBinding
 import com.eazywrite.app.ui.FrequentlyAskedQuestionsActivity
-import com.eazywrite.app.ui.author.SettingsActivity
 import com.eazywrite.app.ui.profile.feedback.FeedbackActivity
 import com.eazywrite.app.ui.welcome.LoginActivity
 import com.eazywrite.app.ui.wiget.MarkdowmTextView

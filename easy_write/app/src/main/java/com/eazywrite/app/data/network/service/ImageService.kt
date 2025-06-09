@@ -6,10 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-/**
- * @author wilinz
- * @date 2023/3/3 9:17
- */
+
 interface ImageService {
     /**
      * 国内通用票据识别

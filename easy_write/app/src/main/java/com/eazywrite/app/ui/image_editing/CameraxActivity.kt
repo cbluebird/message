@@ -72,10 +72,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-/**
- * @author wilinz
- * @date 2023/3/2 8:34
- */
+
 class CameraXActivity : ComponentActivity() {
 
     private var isFlashOpen: Boolean by mutableStateOf(false)
