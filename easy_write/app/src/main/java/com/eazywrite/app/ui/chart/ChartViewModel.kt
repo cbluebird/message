@@ -30,7 +30,10 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
     // 折线图数据状态
     var lineChartData by mutableStateOf<List<AASeriesElement>>(listOf())
-
+/*
+* AASeriesElement 类是来自AAChartKit图表库
+*mutableStateOf 来创建状态变量时，Jetpack Compose 会负责管理状态的更新和观察者,mutableStateOf 是一个用于创建可观察状态的API
+* */
     // 折线图X轴数据状态
     var lineChartXData: SnapshotStateList<String> = mutableStateListOf()
 
@@ -56,10 +59,32 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+    *(1)viewModelScope 是 ViewModel 的一个属性，
+    * 它提供了一个 CoroutineScope，用于在 ViewModel 的生命周期内启动协程
+    *(2) launch 是 CoroutineScope 的一个方法，
+    * 用于启动一个新的协程，而不需要等待其完成。这允许并发执行多个协程
+    * */
+/**
+* 第一个协程调用 getLineChartData(year, month) 函数，获取折线图的数据。
+ * 第二个协程调用 getPieDate(year, month) 函数，获取饼图的数据
+ * 这两个函数都是挂起函数（suspend functions），
+ * 意味着它们可以在等待其他挂起函数完成时挂起执行，通常用于异步操作，如网络请求或数据库操作
+* */
+
+
+    /**
      * 获取指定年份和可选月份的折线图数据。
      * @param year 要获取数据的年份。
      * @param month 要获取数据的月份，如果为null则获取整年数据。
      */
+    /**
+     * suspend fun：声明了一个挂起函数，它可以挂起其他挂起函数，通常用于执行异步操作。
+     * year: Int：函数的必需参数，类型为整数，表示年份。
+     * month: Int? = null：函数的可选参数，类型为整数，可以为 null，表示月份。
+     * DateTimeFormatter.ofPattern(...)：根据是否为月份选择不同的日期格式
+     * viewModelScope.launch 是一个协程构建器，它启动了一个协程。在这个协程的上下文中，你可以调用挂起函数
+     */
+
     private suspend fun getLineChartData(year: Int, month: Int? = null) {
         val labelList =
             if (month == null) getMonthListByYear(year) else getDayListByMonth(year, month)
@@ -81,11 +106,20 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
                 start, end, type = Bill.TYPE_OUT
             ) ?: BigDecimal.ZERO
         }
+        /**
+        map { ... }：对 labelList 中的每个时间范围应用数据获取操
+        ?: BigDecimal.ZERO：如果获取的金额为 null，则使用 B
+        igDecimal.ZERO 作为默认值
+         */
         val inData = labelList.map { (start, end) ->
             db.billDao().getTotalAmount(
                 start, end, type = Bill.TYPE_IN
             ) ?: BigDecimal.ZERO
         }
+        /**
+         * AASeriesElement().apply { ... }：创建一个 AASeriesElement 对象并配置其名称和数据
+         * this.data(...)： 转换为浮点数数组
+         */
         lineChartData = listOf(
             AASeriesElement().apply {
                 name("消费")
@@ -99,6 +133,19 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 根据年份获取月份范围列表
+    /**
+     * : List<Pair<LocalDate, LocalDate>>：函数返回类型，表示函数返回一个列表，
+     * 列表中的每个元素是一个 Pair，包含两个 LocalDate 对象，分别代表每个月的开始和结束日期
+     * [
+     *   (2024-01-01T00:00, 2024-02-01T00:00),
+     *   (2024-02-01T00:00, 2024-03-01T00:00),
+     *   (2024-03-01T00:00, 2024-04-01T00:00),
+     *   ...
+     *   (2024-11-01T00:00, 2024-12-01T00:00),
+     *   (2024-12-01T00:00, 2025-01-01T00:00)
+     * ]
+     */
+
     private fun getMonthListByYear(year: Int): List<Pair<LocalDate, LocalDate>> {
         val list = mutableListOf<Pair<LocalDate, LocalDate>>()
         val date = LocalDate.of(year, 1, 1).atStartOfDay()
@@ -110,6 +157,16 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
         return list
     }
 
+    /**
+     * [
+     *   (2024-06-01T00:00, 2024-06-02T00:00),
+     *   (2024-06-02T00:00, 2024-06-03T00:00),
+     *   (2024-06-03T00:00, 2024-06-04T00:00),
+     *   ...
+     *   (2024-06-28T00:00, 2024-06-29T00:00),
+     *   (2024-06-29T00:00, 2024-06-30T00:00)
+     * ]
+     */
     // 根据年月获取天范围列表
     private fun getDayListByMonth(year: Int, month: Int): List<Pair<LocalDate, LocalDate>> {
         val list = mutableListOf<Pair<LocalDate, LocalDate>>()
@@ -182,10 +239,12 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
      */
     suspend fun generateReports(year: Int, month: Int? = null): String = withContext(Dispatchers.Default) {
         val desc = if (month != null) "这是我${year}年${month}月的一份账单数据" else "这是我${year}年的一份账单数据"
+        //百分比数据和趋势数据
         val data = BillingAnalyticsData(
             percentageData = getPercentageData(year, month),
             trendData = getTrendData(year, month)
         )
+
         val dataJson = moshi1.adapter<BillingAnalyticsData>().toJson(data)
         Log.d(TAG, "generateReports: $dataJson")
         val chatContent = "${desc}，帮我我生成一份形成用户行为分析报告，并给我消费指导建议，以markdown格式回答我（不要使用表格），数据如下：\n${dataJson}"

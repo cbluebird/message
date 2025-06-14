@@ -41,37 +41,39 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+/**
+ * 支付宝账单导入Activity
+ * 功能：提供支付宝账单文件选择和自动化操作支付宝获取账单
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 class AlipayImportActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "AlipayImportActivity"
     }
-
+    // 使用viewModels委托初始化ViewModel
     private val viewModel: AlipayImportViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindow(isDarkStatusBarIcon = true)
-        setData(intent)
+        setWindow(isDarkStatusBarIcon = true) // 设置状态栏图标为深色
+        setData(intent) // 处理传入的Intent数据
         setContent {
             EazyWriteTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Content()
+                    Content() // 主界面内容
                 }
             }
         }
-
     }
-
+    // 获取无障碍服务实例
     private val autoService: AutoAccessibilityService?
         get() = AutoAccessibilityService.instance
-
+    // 协程作用域用于异步操作
     private val autoJob: CoroutineScope = MainScope()
 
     @Composable
@@ -86,10 +88,12 @@ class AlipayImportActivity : ComponentActivity() {
                     .padding(it)
                     .verticalScroll(rememberScrollState())
             ) {
+                // 文件选择组件
                 FileInput(onFileInput = {
-                    viewModel.uri = it
+                    viewModel.uri = it// 将选择的文件URI存入ViewModel
                 })
                 val context = LocalContext.current
+                // 手动打开支付宝按钮
                 ElevatedButton(
                     onClick = {
                         context.packageManager.getLaunchIntentForPackage("com.eg.android.AlipayGphone")
@@ -142,8 +146,12 @@ class AlipayImportActivity : ComponentActivity() {
             }
         }
     }
-
+    /**
+     * 自动化操作支付宝流程
+     * @param context 上下文对象
+     */
     private fun autoJump(context: Context) {
+        // 检查无障碍服务是否启用
         if (autoService == null || !AccessibilityxService.isAccessibilityServiceEnabled(
                 context,
                 AutoAccessibilityService::class.java
@@ -153,6 +161,7 @@ class AlipayImportActivity : ComponentActivity() {
                 "请在无障碍设置中打开“${context.getString(R.string.text_import_invoices_automatically)}”",
                 duration = Toast.LENGTH_LONG
             )
+            // 跳转到无障碍设置界面
             context.startActivity(
                 Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK
@@ -160,14 +169,16 @@ class AlipayImportActivity : ComponentActivity() {
             )
             return
         }
+        // 尝试启动支付宝
         if (launchAppPackage("com.eg.android.AlipayGphone")) {
             autoJob.launch {
                 autoService?.untilFindOne { it.contentDescription1 == "搜索框" }
+                //通过控件的无障碍描述定位
                     ?.ensureClick()
 
                 val editText =
                     autoService?.untilFindOne { it.className1 == "android.widget.EditText" }
-
+                // 在搜索框输入"账单"
                 val arguments =
                     bundleOf(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE to "账单")
                 editText?.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
@@ -207,11 +218,12 @@ class AlipayImportActivity : ComponentActivity() {
                     }
 
                 }
-    //                                val successFlag =
+    //      val successFlag =
     //                                    autoService?.untilFindOne { it.text1 == "邮件发送申请已提交" }
     //                                if (successFlag != null) {
     //                                    toast("申请已提交")
     //                                    autoService?.untilFindOne { it.text1 == "完成" }?.ensureClick()
+                // 返回操作
                 autoService?.untilFindOne { it.text1 == "账单" }
                 for (i in 0 until 1) {
                     delay(500)
@@ -230,18 +242,23 @@ class AlipayImportActivity : ComponentActivity() {
         intent?.let {
             setData(it)
         }
-    }
+    }// 处理新的Intent
 
+    /**
+     * 处理传入的Intent数据
+     * @param intent 包含文件数据的Intent
+     */
     private fun setData(intent: Intent) {
         Log.d(TAG, "setData:action: ${intent.action}")
         Log.d(TAG, "setData:data: ${intent}")
         when (intent.action) {
+            // 处理分享发送的文件
             Intent.ACTION_SEND -> {
                 intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)?.let {
                     viewModel.uri = it
                 }
             }
-
+            // 处理视图打开的文件
             Intent.ACTION_VIEW -> {
                 intent.data?.let {
                     viewModel.uri = it

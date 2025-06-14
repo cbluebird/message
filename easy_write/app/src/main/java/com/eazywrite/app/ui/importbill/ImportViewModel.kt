@@ -80,6 +80,7 @@ abstract class ImportViewModel(application: Application) : AndroidViewModel(appl
             it.printStackTrace()
             val msg = if (it.message == "Wrong password!") "密码错误" else it.javaClass.name
             toast(text = "导入失败：${msg}")
+
         }
     }
 //    onSuccess()

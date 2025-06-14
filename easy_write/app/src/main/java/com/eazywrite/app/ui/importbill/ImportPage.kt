@@ -24,15 +24,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Import(importViewModel: ImportViewModel) {
+    // 状态管理：控制密码对话框显示/隐藏
     var showPasswordDialog by remember {
         mutableStateOf(false)
     }
+    // 协程作用域，用于异步任务
     val scope = rememberCoroutineScope()
-
+// 状态管理：加载中状态（使用 rememberSaveable 支持配置更改后恢复）
     var isLoading by rememberSaveable {
         mutableStateOf(false)
     }
+    // 保存异步任务 Job，用于取消操作
     var job = remember<Job?> { null }
+    // 加载中弹窗
     if (isLoading) {
         CircularProgressDialog(
             onDismissRequest = {
@@ -42,6 +46,7 @@ fun Import(importViewModel: ImportViewModel) {
         )
     }
 
+    // 密码输入弹窗
     if (showPasswordDialog) {
         PasswordDialog(
             onDismissRequest = {
